@@ -91,5 +91,12 @@ def upload_file():
 def uploaded_file(filename):
     return send_file(os.path.join('uploads', filename), as_attachment=True)
 
+@app.after_request
+def add_permission_policy_header(response):
+    response.headers['Permissions-Policy'] = (
+        "geolocation=(), microphone=(), camera=(), fullscreen=(self)"
+    )
+    return response
+
 if __name__ == "__main__":
     app.run(debug=True)
