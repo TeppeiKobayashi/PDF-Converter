@@ -8,7 +8,6 @@ import os
 
 app = Flask(__name__)
 
-# アップロードされたPDFを4ページに結合する関数
 def create_4_in_1_page(pages):
     packet = io.BytesIO()
     temp_writer = PdfWriter()
