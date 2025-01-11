@@ -8,6 +8,10 @@ import os
 
 app = Flask(__name__)
 
+# 'uploads'フォルダが存在しない場合は作成する
+if not os.path.exists('uploads'):
+    os.makedirs('uploads')
+
 def create_4_in_1_page(pages):
     packet = io.BytesIO()
     temp_writer = PdfWriter()
