@@ -49,7 +49,10 @@ def upload_file():
     if request.method == "POST":
         file = request.files['file']
         if file:
-            reader = PdfReader(file)
+            try:
+                reader = PdfReader(file)
+            except Exception as e:
+                return f"Error reading PDF file: {e}", 400
             writer = PdfWriter()
             page_group = []
             for page in reader.pages:
