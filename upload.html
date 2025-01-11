@@ -7,6 +7,9 @@
 </head>
 <body>
     <h1>Upload a PDF file to merge 4 slides into 1 page</h1>
+    <!-- メッセージ表示 -->
+    <h2>{{ message }}</h2>
+
     <form action="/" method="POST" enctype="multipart/form-data">
         <input type="file" name="file" />
         <button type="submit">Upload PDF</button>

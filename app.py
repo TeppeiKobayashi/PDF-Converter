@@ -46,32 +46,34 @@ def create_4_in_1_page(pages):
 
 @app.route("/", methods=["GET", "POST"])
 def upload_file():
+    message = ""  # メッセージの初期化
     if request.method == "POST":
         file = request.files['file']
         if file:
             try:
                 reader = PdfReader(file)
+                writer = PdfWriter()
+                page_group = []
+                for page in reader.pages:
+                    page_group.append(page)
+                    if len(page_group) == 4:
+                        writer.add_page(create_4_in_1_page(page_group))
+                        page_group = []
+
+                if page_group:
+                    while len(page_group) < 4:
+                        page_group.append(None)
+                    writer.add_page(create_4_in_1_page([p for p in page_group if p]))
+
+                output = io.BytesIO()
+                writer.write(output)
+                output.seek(0)
+                message = "PDF conversion successful! You can download the merged file."
+                return send_file(output, mimetype='application/pdf', as_attachment=True, download_name='merged.pdf')
             except Exception as e:
-                return f"Error reading PDF file: {e}", 400
-            writer = PdfWriter()
-            page_group = []
-            for page in reader.pages:
-                page_group.append(page)
-                if len(page_group) == 4:
-                    writer.add_page(create_4_in_1_page(page_group))
-                    page_group = []
+                message = f"Error processing PDF: {e}"
 
-            if page_group:
-                while len(page_group) < 4:
-                    page_group.append(None)
-                writer.add_page(create_4_in_1_page([p for p in page_group if p]))
-
-            output = io.BytesIO()
-            writer.write(output)
-            output.seek(0)
-            return send_file(output, mimetype='application/pdf', as_attachment=True, download_name='merged.pdf')
-
-    return render_template("upload.html")
+    return render_template("upload.html", message=message)
 
 if __name__ == "__main__":
     app.run(debug=True)
