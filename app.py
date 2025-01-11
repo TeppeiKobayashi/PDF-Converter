@@ -6,7 +6,7 @@ import fitz  # PyMuPDF, for rendering pages to images
 import tempfile
 import os
 
-app = Flask(__name__, template_folder='/Users/teppeikobayashi/PDF-Converter/templates')
+app = Flask(__name__, static_folder='static', template_folder='templates')
 
 # 'uploads'フォルダが存在しない場合は作成する
 if not os.path.exists('uploads'):
