@@ -91,6 +91,10 @@ def upload_file():
 def uploaded_file(filename):
     return send_file(os.path.join('uploads', filename), as_attachment=True)
 
+@app.route("/index")
+def index():
+    return render_template("index.html")
+
 @app.after_request
 def add_permission_policy_header(response):
     response.headers['Permissions-Policy'] = (
