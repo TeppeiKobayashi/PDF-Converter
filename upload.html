@@ -7,12 +7,20 @@
 </head>
 <body>
     <h1>Upload a PDF file to merge 4 slides into 1 page</h1>
-    <!-- メッセージ表示 -->
-    <h2>{{ message }}</h2>
-
     <form action="/" method="POST" enctype="multipart/form-data">
         <input type="file" name="file" />
         <button type="submit">Upload PDF</button>
     </form>
+
+    {% if download_url %}
+        <h2>Your PDF has been processed!</h2>
+        <a href="{{ download_url }}" download>
+            <button>Download Merged PDF</button>
+        </a>
+    {% endif %}
+
+    {% if error_message %}
+        <h2>Error: {{ error_message }}</h2>
+    {% endif %}
 </body>
 </html>

@@ -1,12 +1,14 @@
-from flask import Flask, request, send_file, render_template
+from flask import Flask, request, send_file, render_template, redirect, url_for
 import io
 from PyPDF2 import PdfReader, PdfWriter
 from reportlab.pdfgen import canvas
 import fitz  # PyMuPDF, for rendering pages to images
 import tempfile
+import os
 
 app = Flask(__name__)
 
+# アップロードされたPDFを4ページに結合する関数
 def create_4_in_1_page(pages):
     packet = io.BytesIO()
     temp_writer = PdfWriter()
@@ -46,7 +48,6 @@ def create_4_in_1_page(pages):
 
 @app.route("/", methods=["GET", "POST"])
 def upload_file():
-    message = ""  # メッセージの初期化
     if request.method == "POST":
         file = request.files['file']
         if file:
@@ -68,12 +69,24 @@ def upload_file():
                 output = io.BytesIO()
                 writer.write(output)
                 output.seek(0)
-                message = "PDF conversion successful! You can download the merged file."
-                return send_file(output, mimetype='application/pdf', as_attachment=True, download_name='merged.pdf')
-            except Exception as e:
-                message = f"Error processing PDF: {e}"
 
-    return render_template("upload.html", message=message)
+                # 保存するファイル名を生成
+                output_pdf_path = os.path.join('uploads', 'merged.pdf')
+                with open(output_pdf_path, 'wb') as output_pdf:
+                    output_pdf.write(output.read())
+                
+                # ダウンロードURLを生成
+                download_url = url_for('uploaded_file', filename='merged.pdf')
+
+                return render_template("upload.html", download_url=download_url)
+            except Exception as e:
+                return render_template("upload.html", error_message=str(e))
+
+    return render_template("upload.html")
+
+@app.route("/uploads/<filename>")
+def uploaded_file(filename):
+    return send_file(os.path.join('uploads', filename), as_attachment=True)
 
 if __name__ == "__main__":
     app.run(debug=True)
